@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../DeviceDriver/DeviceDriver.cpp"
+#include "../DeviceDriver/App.cpp"
 
 using namespace testing;
 using namespace std;
@@ -47,4 +48,40 @@ TEST(TestCaseName, WriteException) {
 
 	DeviceDriver device_driver(&flash_device_mock);
 	EXPECT_THROW(device_driver.write(0x0, 0xba), WriteFailException);
+}
+
+TEST(TestCaseName, ReadAndPoint) {
+	FlashMemoryDeviceAPIMock flash_device_mock;
+	EXPECT_CALL(flash_device_mock, read(0x2)).WillRepeatedly(Return(0x20));
+	EXPECT_CALL(flash_device_mock, read(0x3)).WillRepeatedly(Return(0x30));
+	EXPECT_CALL(flash_device_mock, read(0x4)).WillRepeatedly(Return(0x40));
+
+	DeviceDriver device_driver(&flash_device_mock);
+	Application app(&device_driver);
+
+	vector<int> result;
+	result = app.ReadAndPrint(0x2, 0x4);
+	EXPECT_THAT(result[0], Eq(0x20));
+	EXPECT_THAT(result[1], Eq(0x30));
+	EXPECT_THAT(result[2], Eq(0x40));
+}
+
+TEST(TestCaseName, WriteAll) {
+	FlashMemoryDeviceAPIMock flash_device_mock;
+	EXPECT_CALL(flash_device_mock, read(0x0)).WillOnce(Return(0xff));
+	EXPECT_CALL(flash_device_mock, read(0x1)).WillOnce(Return(0xff));
+	EXPECT_CALL(flash_device_mock, read(0x2)).WillOnce(Return(0xff));
+	EXPECT_CALL(flash_device_mock, read(0x3)).WillOnce(Return(0xff));
+	EXPECT_CALL(flash_device_mock, read(0x4)).WillOnce(Return(0xff));
+
+	EXPECT_CALL(flash_device_mock, write(0x0, 0xba)).Times(1);
+	EXPECT_CALL(flash_device_mock, write(0x1, 0xba)).Times(1);
+	EXPECT_CALL(flash_device_mock, write(0x2, 0xba)).Times(1);
+	EXPECT_CALL(flash_device_mock, write(0x3, 0xba)).Times(1);
+	EXPECT_CALL(flash_device_mock, write(0x4, 0xba)).Times(1);
+
+	DeviceDriver device_driver(&flash_device_mock);
+	Application app(&device_driver);
+
+	EXPECT_NO_THROW(app.WriteAll(0xba));
 }
