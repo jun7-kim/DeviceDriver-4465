@@ -14,6 +14,15 @@ public:
 	}
 };
 
+class WriteFailException : public exception
+{
+public:
+	const char* what()
+	{
+		return "WriteFailException is occurred";
+	}
+};
+
 DeviceDriver::DeviceDriver(FlashMemoryDeviceAPI* hardware) : m_hardware(hardware)
 {}
 
@@ -35,7 +44,11 @@ int DeviceDriver::read(long address)
 
 void DeviceDriver::write(long address, int data)
 {
-	// TODO: implement this method
+	int cur_value = (int)(m_hardware->read(address));
+	if (cur_value != 0xff)
+	{
+		throw WriteFailException();
+	}
 	m_hardware->write(address, (unsigned char)data);
 }
 

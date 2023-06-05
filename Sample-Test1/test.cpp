@@ -32,3 +32,19 @@ TEST(TestCaseName, ReadException) {
 	DeviceDriver device_driver(&flash_device_mock);
 	EXPECT_THROW(device_driver.read(0x0), ReadFailException);
 }
+
+TEST(TestCaseName, WriteNormal) {
+	FlashMemoryDeviceAPIMock flash_device_mock;
+	EXPECT_CALL(flash_device_mock, read(0x0)).WillRepeatedly(Return(0xff));
+
+	DeviceDriver device_driver(&flash_device_mock);
+	EXPECT_NO_THROW(device_driver.write(0x0, 0xba));
+}
+
+TEST(TestCaseName, WriteException) {
+	FlashMemoryDeviceAPIMock flash_device_mock;
+	EXPECT_CALL(flash_device_mock, read(0x0)).WillRepeatedly(Return(0x1));
+
+	DeviceDriver device_driver(&flash_device_mock);
+	EXPECT_THROW(device_driver.write(0x0, 0xba), WriteFailException);
+}
