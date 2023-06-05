@@ -4,10 +4,16 @@
 class DeviceDriver
 {
 public:
-    DeviceDriver(FlashMemoryDevice* hardware);
-    int read(long address);
-    void write(long address, int data);
+	DeviceDriver(FlashMemoryDeviceAPI* hardware);
+	int read(long address);
+	void write(long address, int data);
+
+private:
+	void waitDelay();
 
 protected:
-    FlashMemoryDevice* m_hardware;
+	FlashMemoryDeviceAPI* m_hardware;
+
+private:
+	const int repeat_read_cnt = 5;
 };

@@ -5,7 +5,16 @@
  * However, the interface for using the device is a lot more complex than that. It is outlined in the top-level README file.
  */
 
-class FlashMemoryDevice
+#define interface struct
+
+interface FlashMemoryDeviceAPI
+{
+public:
+    virtual unsigned char read(long address) = 0;
+    virtual void write(long address, unsigned char data) = 0;
+};
+
+class FlashMemoryDevice : public FlashMemoryDeviceAPI
 {
 public:
     virtual unsigned char read(long address) = 0;
